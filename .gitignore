@@ -26,6 +26,8 @@ quantum/version.h
 CMakeLists.txt
 cmake-build-debug
 .clang_complete
+.clangd/
+compile_commands.json
 doxygen/
 .DS_Store
 /util/wsl_downloaded
