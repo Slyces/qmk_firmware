@@ -79,20 +79,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * Base Layer: Gaming
  *
  * ,-------------------------------------------.
- * |   TAB  |   1  |   2  |   3  |   4  |   5  |
+ * |   ESC  |   1  |   2  |   3  |   4  |   5  |
  * |--------+------+------+------+------+------|
- * |   NAV  |   Q  |   W  |  E   |   R  |   T  |
+ * |   TAB  |   T  |   Q  |   W  |  E   |   R  |
  * |--------+------+------+------+------+------+-------------.
- * | LShift |   A  |   S  |   D  |   F  |   G  | Enter|  ESC |
- * `----------------------+------+------+------+      +------|
- *                        | LCTL | GUI  | RALT |      | NUM  |
+ * |        |   G  |   A  |   S  |   D  |   F  | base |      |
+ * `---------------+-------------+------+------+------+------|
+ *                        |      | CTRL |  ALT | SPACE| ENTR |
  *                        |      |      |      |      |      |
  *                        `----------------------------------'
  */
     [_GAMING] = LAYOUT(
-      KC_ESC , KC_1, KC_2, KC_3, KC_4, KC_5,                                           _______, _______, _______, _______, _______, _______,
-      KC_TAB , KC_Q, KC_W, KC_E, KC_R, KC_T,                                          _______, _______, _______, _______, _______, _______,
-      _______, KC_A, KC_S, KC_D, KC_D, KC_G, DF(_COLEMAK), _______, _______, _______, _______, _______, _______, _______, _______, _______,
+      KC_ESC , KC_5, KC_1, KC_2, KC_3, KC_4,                                           _______, _______, _______, _______, _______, _______,
+      KC_TAB , KC_T, KC_Q, KC_W, KC_E, KC_R,                                          _______, _______, _______, _______, _______, _______,
+      _______, KC_G, KC_A, KC_S, KC_D, KC_D, DF(_COLEMAK), _______, _______, _______, _______, _______, _______, _______, _______, _______,
                            _______, _______, KC_LALT, KC_SPC , _______, _______, _______, _______, _______, _______
     ),
 
@@ -222,8 +222,8 @@ void keyboard_post_init_user(void) {
     rgblight_enable_noeeprom();
     rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), 80);
     default_layer_rgb(default_layer_state);
-    /*rgblight_sethsv_range(HS_BLUE, rgblight_get_val(), 4, 8);*/
-    /*rgblight_sethsv_range(HS_BLUE, rgblight_get_val(), 14, 18);*/
+    rgblight_sethsv_range(HS_BLUE, rgblight_get_val(), 4, 8);
+    rgblight_sethsv_range(HS_BLUE, rgblight_get_val(), 14, 18);
 #endif // RGBLIGHT_ENABLE
 }
 
