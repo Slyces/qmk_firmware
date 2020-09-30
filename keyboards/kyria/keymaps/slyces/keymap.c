@@ -43,15 +43,30 @@ enum {
     DOUBLE_TAP
 };
 
+// rgb version of functions
+#ifdef RGBLIGHT_ENABLE
+void keyboard_post_init_rgb(void);
+void layer_state_set_rgb(uint32_t state);
+void default_layer_state_set_rgb(uint32_t default_state);
+#endif // RGBLIGHT_ENABLE
+
 // Function associated with all tap dances
 uint8_t cur_dance(qk_tap_dance_state_t *state);
 
-// Functions associated with [move → key]
-void mtd_finished(qk_tap_dance_state_t *state, void *user_data);
-void mtd_reset(qk_tap_dance_state_t *state, void *user_data);
+// Move → key
+void mv_finished(qk_tap_dance_state_t *state, void *user_data);
+void mv_reset(qk_tap_dance_state_t *state, void *user_data);
 
-void scol_finished(qk_tap_dance_state_t *state, void *user_data);
-void scol_reset(qk_tap_dance_state_t *state, void *user_data);
+// Shift
+void sft_finished(qk_tap_dance_state_t *state, void *user_data);
+void sft_reset(qk_tap_dance_state_t *state, void *user_data);
+
+#define _COLEMAK 0
+#define _GAMING 1
+#define _SYMB 3
+#define _NUM 4
+#define _CONFIG 5
+#define __LAST 6
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
@@ -178,23 +193,101 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 //     ),
 };
 
-
+void keyboard_post_init_user(void) {
 #ifdef RGBLIGHT_ENABLE
-void default_layer_rgb(uint32_t default_state) {
-    uint8_t val = rgblight_get_val();
-    switch (biton32(default_state)) {
-        case _COLEMAK:
-            rgblight_sethsv_noeeprom(HS_WHITE, val); break;
-        case _GAMING:
-            rgblight_sethsv_noeeprom(HS_RED, val); break;
-        default:
-            rgblight_sethsv_noeeprom(HS_WHITE, val); break;
-    }
-}
+    keyboard_post_init_rgb();
 #endif // RGBLIGHT_ENABLE
+}
 
 uint32_t layer_state_set_user(uint32_t state) {
 #ifdef RGBLIGHT_ENABLE
+    layer_state_set_rgb(state);
+#endif // RGBLIGHT_ENABLE
+    return state;
+}
+
+uint32_t default_layer_state_set_user(uint32_t default_state) {
+#if defined(RGBLIGHT_ENABLE) && ! defined(RGBLIGHT_LAYERS)
+    default_layer_state_set_rgb(default_state);
+#endif // RGBLIGHT_ENABLE && ! RGBLIGHT_LAYERS
+    return default_state;
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        default:
+            return true;
+    }
+}
+
+void matrix_scan_user(void) {
+#ifdef RGBLIGHT_LAYERS
+    led_update_user(host_keyboard_led_state());
+#endif // RGBLIGHT_LAYERS
+}
+
+/* ─────────────────────────────── RGB lights ─────────────────────────────── */
+
+#ifdef RGBLIGHT_LAYERS
+const rgblight_segment_t PROGMEM rgb_gaming_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_RED} );
+const rgblight_segment_t PROGMEM rgb_config_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_PURPLE} );
+const rgblight_segment_t PROGMEM rgb_colemak_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_WHITE} );
+const rgblight_segment_t PROGMEM rgb_symbols_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_BLUE} );
+const rgblight_segment_t PROGMEM rgb_numbers_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_GREEN} );
+
+const rgblight_segment_t PROGMEM rgb_alt_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {5, 2, HS_GOLD},
+    {15, 2, HS_GOLD}
+);
+
+const rgblight_segment_t PROGMEM rgb_ctrl_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {2, 2, HS_GOLD},
+    {12, 2, HS_GOLD}
+);
+const rgblight_segment_t PROGMEM rgb_shift_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 2, HS_GOLD},
+    {10, 2, HS_GOLD}
+);
+
+
+const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
+    rgb_colemak_layer,
+    rgb_gaming_layer,
+    rgb_symbols_layer,
+    rgb_numbers_layer,
+    rgb_config_layer,
+    rgb_alt_layer,
+    rgb_ctrl_layer,
+    rgb_shift_layer
+);
+
+bool led_update_user(led_t led_state) {
+    rgblight_set_layer_state(5, get_mods() & MOD_MASK_ALT);
+    rgblight_set_layer_state(6, get_mods() & MOD_MASK_CTRL);
+    rgblight_set_layer_state(7, get_mods() & MOD_MASK_SHIFT);
+    return true;
+}
+#endif
+
+#ifdef RGBLIGHT_ENABLE
+void keyboard_post_init_rgb(void) {
+    rgblight_enable_noeeprom();
+    rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), 80);
+#    ifdef RGBLIGHT_LAYERS
+    rgblight_layers = my_rgb_layers;
+#    else
+    default_layer_rgb(default_layer_state);
+#    endif // RGBLIGHT_LAYERS
+}
+
+void layer_state_set_rgb(uint32_t state) {
+#    ifdef RGBLIGHT_LAYERS
+    // State for normal layers
+    for (int i = _SYMB; i < __LAST; i++) {
+        rgblight_set_layer_state(i, layer_state_cmp(state, i));
+    }
+    /*send_layer_via_hid(state);*/
+#    else
     uint8_t val = rgblight_get_val();
     switch (biton32(state)) {
         case _SYMB:
@@ -206,26 +299,33 @@ uint32_t layer_state_set_user(uint32_t state) {
         default:
             default_layer_rgb(default_layer_state); break;
     }
-#endif // RGBLIGHT_ENABLE
-    return state;
+#    endif // RGBLIGHT_LAYERS
 }
 
-uint32_t default_layer_state_set_user(uint32_t default_state) {
-#ifdef RGBLIGHT_ENABLE
+void default_layer_state_set_rgb(uint32_t default_state) {
+#    ifdef RGBLIGHT_LAYERS
+    // Default layers
+    rgblight_set_layer_state(_COLEMAK, default_state & (1UL << _COLEMAK));
+    rgblight_set_layer_state(_GAMING, default_state & (1UL << _GAMING));
+#    else
     default_layer_rgb(default_state);
-#endif // RGBLIGHT_ENABLE
-    return default_state;
+#    endif // ! RGBLIGHT_LAYERS
 }
 
-void keyboard_post_init_user(void) {
-#ifdef RGBLIGHT_ENABLE
-    rgblight_enable_noeeprom();
-    rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), 80);
-    default_layer_rgb(default_layer_state);
-    rgblight_sethsv_range(HS_BLUE, rgblight_get_val(), 4, 8);
-    rgblight_sethsv_range(HS_BLUE, rgblight_get_val(), 14, 18);
-#endif // RGBLIGHT_ENABLE
+#    ifndef RGBLIGHT_LAYERS
+void default_layer_rgb(uint32_t default_state) {
+    uint8_t val = rgblight_get_val();
+    switch (biton32(default_state)) {
+        case _COLEMAK:
+            rgblight_sethsv_noeeprom(HS_WHITE, val); break;
+        case _GAMING:
+            rgblight_sethsv_noeeprom(HS_RED, val); break;
+        default:
+            rgblight_sethsv_noeeprom(HS_WHITE, val); break;
+    }
 }
+#    endif // ! RGBLIGHT_LAYERS
+#endif // RGBLIGHT_ENABLE
 
 
 /* ─────────────────────────────── Tap Dance ──────────────────────────────── */
@@ -243,19 +343,19 @@ uint8_t cur_dance(qk_tap_dance_state_t *state) {
     else return 8;
 }
 
-static tap mtd_state = {
+static tap mv_state = {
     .is_press_action = true,
     .state = 0
 };
-static tap scol_state = {
+static tap sft_state = {
     .is_press_action = true,
     .state = 0
 };
 
 // Functions that control what our tap dance key does
-void mtd_finished(qk_tap_dance_state_t *state, void *user_data) {
-    mtd_state.state = cur_dance(state);
-    switch (mtd_state.state) {
+void mv_finished(qk_tap_dance_state_t *state, void *user_data) {
+    mv_state.state = cur_dance(state);
+    switch (mv_state.state) {
         case SINGLE_HOLD:  // Hold → CTRL
             register_code(KC_LCTL);
             break;
@@ -272,38 +372,38 @@ void mtd_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void mtd_reset(qk_tap_dance_state_t *state, void *user_data) {
+void mv_reset(qk_tap_dance_state_t *state, void *user_data) {
     // If the key was held down and now is released then switch off the mod
-    switch (mtd_state.state) {
+    switch (mv_state.state) {
         case SINGLE_TAP: break;
         case SINGLE_HOLD: unregister_code(KC_LCTRL); break;
         case DOUBLE_TAP: break;
     }
-    mtd_state.state = 0;
+    mv_state.state = 0;
 }
 
 // Functions that control what our tap dance key does
-void scol_finished(qk_tap_dance_state_t *state, void *user_data) {
-    scol_state.state = cur_dance(state);
-    switch (scol_state.state) {
+void sft_finished(qk_tap_dance_state_t *state, void *user_data) {
+    sft_state.state = cur_dance(state);
+    switch (sft_state.state) {
         case SINGLE_HOLD: register_code(KC_LSFT); break;
         case SINGLE_TAP: register_code16(KC_COLN); break;
     }
 }
 
-void scol_reset(qk_tap_dance_state_t *state, void *user_data) {
+void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
     // If the key was held down and now is released then switch off the mod
-    switch (scol_state.state) {
+    switch (sft_state.state) {
         case SINGLE_HOLD: unregister_code(KC_LSFT); break;
         case SINGLE_TAP: unregister_code16(KC_COLN); break;
     }
-    scol_state.state = 0;
+    sft_state.state = 0;
 }
 
 // Associate our tap dance key with its functionality
 qk_tap_dance_action_t tap_dance_actions[] = {
-    [TD_MOVE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mtd_finished, mtd_reset),
-    [TD_SCOL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, scol_finished, scol_reset),
+    [TD_MOVE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mv_finished, mv_reset),
+    [TD_SCOL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset),
 
 };
 

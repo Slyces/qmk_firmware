@@ -17,12 +17,15 @@
 #pragma once
 
 #ifdef RGBLIGHT_ENABLE
+  // RGB steps for manual color/intendity change
   #define RGBLIGHT_HUE_STEP 8
   #define RGBLIGHT_SAT_STEP 8
   #define RGBLIGHT_VAL_STEP 8
-  #define RGBLIGHT_SPLIT
-  // RGB too bright cause powr issues
+  // RGB too bright cause power issues
   #define RGBLIGHT_LIMIT_VAL 180
+  #define RGBLIGHT_ANIMATIONS
+  #define RGBLIGHT_SPLIT
+  #define RGBLIGHT_LAYERS
 #endif
 
 // Home row mods

@@ -187,7 +187,6 @@ typedef struct {
     uint8_t count;  // The number of LEDs to light
     uint8_t hue;
     uint8_t sat;
-    uint8_t val;
 } rgblight_segment_t;
 
 #        define RGBLIGHT_END_SEGMENT_INDEX (255)
