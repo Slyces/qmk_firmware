@@ -13,233 +13,240 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include QMK_KEYBOARD_H
+#include "slyces.h"
+#include "wrappers.h"
 
-// Layers declarations
-enum layers {
-    _COLEMAK = 0,
-    _GAMING,
-    _SYMB,
-    _NUM,
-    _CONFIG
-};
+/* ──────────────────────────────────── kyria specific layout ──────────────────────────────────── */
+/* For personal convenience, I chose to reorder the keys to have a slightly more compact display of
+ * each keymap.
+ * --------------------------------------------------------------------------------------------------
+ * → Original layout:
+ * ,------------------------------------.                          ,------------------------------------.
+ * |  K00 | K01 | K02 | K03 | K04 | K05 |                          | K06 | K07 | K08 | K09 | K10 |  K11 |
+ * |------+-----+-----+-----+-----+-----|                          |-----+-----+-----+-----+-----+------|
+ * |  K12 | K13 | K14 | K15 | K16 | K17 |                          | K18 | K19 | K20 | K21 | K22 |  K23 |
+ * |------+-----+-----+-----+-----+-----+-----------.  ,-----------+-----+-----+-----+-----+-----+------|
+ * |  K24 | K25 | K26 | K27 | K28 | K29 | K30 | K31 |  | K32 | K33 | K34 | K35 | K36 | K37 | K38 |  K39 |
+ * `------------------+-----+-----+-----+-----+-----|  |-----+-----+-----+-----+-----+------------------'
+ *                    | K40 | K41 | K42 | K43 | K44 |  | K45 | K46 | K47 | K48 | K49 |
+ *                    `-----------------------------'  `-----------------------------'
+ * corresponding code:
+ *
+ *  [_LAYER] = LAYOUT(
+   KC_00, KC_01, KC_02, KC_03, KC_04, KC_05,                             KC_06, KC_07, KC_08, KC_09, KC_10, KC_11, \
+   KC_12, KC_13, KC_14, KC_15, KC_16, KC_17,                             KC_18, KC_19, KC_20, KC_21, KC_22, KC_23, \
+   KC_24, KC_25, KC_26, KC_27, KC_28, KC_29, KC_30, KC_31, KC_32, KC_33, KC_34, KC_35, KC_36, KC_37, KC_38, KC_39, \
+                        KC_40, KC_41, KC_42, KC_43, KC_44, KC_45, KC_46, KC_47, KC_48, KC_49 \
+ *  ),
+ *
+ * I find this code impractical because the bottom row (K40 - K49), and the middle 4 buttons of the
+ * 3rd row (K30 - K33) tend to be non-alphanumeric keycodes, quite longer than most, thus stretching
+ * the space in the middle and creating very long lines.
+ *
+ * --------------------------------------------------------------------------------------------------
+ * → New custom layout:
+ * ,--------. ,----------------------------------.    ,----------------------------------. ,--------.
+ * |  K00   | |  K01 |  K02 |  K03 |  K04 |  K05 |    |  K06 |  K07 |  K08 |  K09 |  K10 | |  K11   |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |  K12   | |  K13 |  K14 |  K15 |  K16 |  K17 |    |  K18 |  K19 |  K20 |  K21 |  K22 | |  K23   |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |  K24   | |  K25 |  K26 |  K27 |  K28 |  K29 |    |  K34 |  K35 |  K36 |  K37 |  K38 | |  K39   |
+ * `--------' `----------------------------------'    `----------------------------------' `--------'
+ *                                 ,-------------.    ,-------------.
+ *                                 |  K30 |  K31 |    |  K32 |  K33 |
+ *            ,--------------------+------+------|    |------+------+------+------+------.
+ *            |  K40 |  K41 |  K42 |  K43 |  K44 |    |  K45 |  K46 |  K47 |  K48 |  K49 |
+ *            `----------------------------------'    `----------------------------------'
+ *
+ * corresponding code:
+ *
+ *  [_Layer] = LAYOUT(
+ *     KC_00, KC_01, KC_02, KC_03, KC_04, KC_05,  KC_06, KC_07, KC_08, KC_09, KC_10, KC_11, \
+ *     KC_12, KC_13, KC_14, KC_15, KC_16, KC_17,  KC_18, KC_19, KC_20, KC_21, KC_22, KC_23, \
+ *     KC_24, KC_25, KC_26, KC_27, KC_28, KC_29,  KC_34, KC_35, KC_36, KC_37, KC_38, KC_39, \
+ *                                 KC_30, KC_31,  KC_32, KC_33, \
+ *            KC_40, KC_41, KC_42, KC_43, KC_44,  KC_45, KC_46, KC_47, KC_48, KC_49 \
+ *  ),
+ *
+ * The code allows for more compact definitions by keeping logical sections separated:
+ * - alphanumeric rows (3x5 keys left, 3x5 keys right) are adjacent
+ * - thumb cluster split on its own lines
+ * - never more than 12 keys on a single line
+ */
+#define LAYOUT_kyria_custom( \
+   KC_00, KC_01, KC_02, KC_03, KC_04, KC_05,  KC_06, KC_07, KC_08, KC_09, KC_10, KC_11, \
+   KC_12, KC_13, KC_14, KC_15, KC_16, KC_17,  KC_18, KC_19, KC_20, KC_21, KC_22, KC_23, \
+   KC_24, KC_25, KC_26, KC_27, KC_28, KC_29,  KC_34, KC_35, KC_36, KC_37, KC_38, KC_39, \
+                               KC_30, KC_31,  KC_32, KC_33, \
+          KC_40, KC_41, KC_42, KC_43, KC_44,  KC_45, KC_46, KC_47, KC_48, KC_49 \
+  ) \
+  LAYOUT_wrapper( \
+   KC_00, KC_01, KC_02, KC_03, KC_04, KC_05,                             KC_06, KC_07, KC_08, KC_09, KC_10, KC_11, \
+   KC_12, KC_13, KC_14, KC_15, KC_16, KC_17,                             KC_18, KC_19, KC_20, KC_21, KC_22, KC_23, \
+   KC_24, KC_25, KC_26, KC_27, KC_28, KC_29, KC_30, KC_31, KC_32, KC_33, KC_34, KC_35, KC_36, KC_37, KC_38, KC_39, \
+                        KC_40, KC_41, KC_42, KC_43, KC_44, KC_45, KC_46, KC_47, KC_48, KC_49 \
+    )
 
-// Tap dance keycodes
-enum td_keycodes {
-    TD_MOVE,
-    TD_SCOL
-};
+/* Re-pass though to allow templates to be used */
+#define LAYOUT_kyria_custom_wrapper(...)       LAYOUT_kyria_custom(__VA_ARGS__)
 
-// Tap dance definitions
-typedef struct {
-    bool is_press_action;
-    uint8_t state;
-} tap;
+/* ───────────────────────────────────── Tap dance Shprtcuts ───────────────────────────────────── */
+#ifdef TAP_DANCE_ENABLE
+    #define TD_M TD(TD_MOVE)
+#else
+    #define TD_M _______
+#endif
 
-// Define a type for as many tap dance states as you need
-enum {
-    SINGLE_TAP = 1,
-    SINGLE_HOLD,
-    DOUBLE_TAP
-};
+/* ─────────────────────────────────────── Thumb Clusters ──────────────────────────────────────── */
+/*                                 ,-------------.    ,-------------.
+ *                                 |      |      |    |      |      |
+ *            ,--------------------+------+------|    |------+------+--------------------.
+ *            |      |      |      |      |      |    |      |      |      |      |      |
+ *            |      |      |      |      |      |    |      |      |      |      |      |
+ *            `----------------------------------'    `----------------------------------'
+ */
+#define ______________BLANK_THUMBS_CLUSTER_____________ \
+                              _______, _______,   _______, _______, \
+   _______, _______, _______, _______, _______,   _______, _______, _______, _______, _______
 
-// rgb version of functions
-#ifdef RGBLIGHT_ENABLE
-void keyboard_post_init_rgb(void);
-void layer_state_set_rgb(uint32_t state);
-void default_layer_state_set_rgb(uint32_t default_state);
-#endif // RGBLIGHT_ENABLE
 
-// Function associated with all tap dances
-uint8_t cur_dance(qk_tap_dance_state_t *state);
+/*                                 ,-------------.    ,-------------.
+ *                                 |GAMING|CONFIG|    |CONFIG|GAMING|
+ *            ,--------------------+------+------|    |------+------+--------------------.
+ *            |      |      | ESC  | ENTR |  i3  |    |  i3  | SPC  |  TAB |      |      |
+ *            |      |      |[ALT] |[CTRL]| tmux |    | tmux |[CTRL]| [ALT]|      |      |
+ *            `----------------------------------'    `----------------------------------'
+ */
+#define _____________DEFAULT_THUMBS_CLUSTER____________ \
+                             DF(_GAMING), MO(_CONFIG), MO(_CONFIG), DF(_GAMING), \
+ _______, _______, ALT_T(KC_ESC), CTL_T(KC_ENT), TD_M, TD_M, CTL_T(KC_SPC), ALT_T(KC_TAB), _______, _______
 
-// Move → key
-void mv_finished(qk_tap_dance_state_t *state, void *user_data);
-void mv_reset(qk_tap_dance_state_t *state, void *user_data);
-
-// Shift
-void sft_finished(qk_tap_dance_state_t *state, void *user_data);
-void sft_reset(qk_tap_dance_state_t *state, void *user_data);
-
-#define _COLEMAK 0
-#define _GAMING 1
-#define _SYMB 3
-#define _NUM 4
-#define _CONFIG 5
-#define __LAST 6
-
+/* ─────────────────────────────────────────── layers ──────────────────────────────────────────── */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
  * Base Layer: Colemak
  *
- * ,-------------------------------------------.                              ,-------------------------------------------.
- * |  ESC   |   Q  |   W  |   F  |   P  |   B  |                              |   J  |   L  |   U  |   Y  | ;  : |  DEL   |
- * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |  BSPC  |   A  |   R  |  S   |   T  |   G  |                              |   M  |   N  |   E  |   I  |   O  |  ' "   |
- * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * | LSHIFT |   Z  |   X  |   C  |   D  |   V  | GAME |  ESC |  |CONFIG|Space |   K  |   H  | ,  < | . >  | /  ? | RSHIFT |
- * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |  NUM | ESC  | ENTR | CTRL |  | CTRL | SPC  | TAB  |  NUM |      |
- *                        |      | +ALT |SHIFT |      |      |  |      |SHIFT |(RCTL)| +ALT |      |
- *                        `----------------------------------'  `----------------------------------'
+ * ,--------. ,----------------------------------.    ,----------------------------------. ,--------.
+ * |  ESC   | |   Q  |   W  |   F  |   P  |   B  |    |   J  |   L  |   U  |   Y  |  ; : | |  DEL   |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |  TAB   | |   A  |   R  |   S  |   T  |   G  |    |   M  |   N  |   E  |   I  |   O  | | BACKSP |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * | LSHIFT | |   Z  |   X  |   C  |   D  |   V  |    |   K  |   H  |  , < |  . > |  / ? | | RSHIFT |
+ * `--------' `----------------------------------'    `----------------------------------' `--------'
+ *                                 ,-------------.    ,-------------.
+ *                                 |GAMING|CONFIG|    |CONFIG|GAMING|
+ *            ,--------------------+------+------|    |------+------+--------------------.
+ *            |      |      | ESC  | ENTR |  i3  |    |  i3  | SPC  |  TAB |      |      |
+ *            |      |      |[ALT] |[CTRL]| tmux |    | tmux |[CTRL]| [ALT]|      |      |
+ *            `----------------------------------'    `----------------------------------'
  */
-    [_COLEMAK] = LAYOUT(
-      A(KC_E), KC_Q, KC_W,      KC_F,      KC_P, KC_B,                                           KC_J, KC_L, KC_U,      KC_Y,      KC_SCLN, KC_DEL,
-      KC_BSPC, KC_A, LTN(KC_R), LTS(KC_S), KC_T, KC_G,                                           KC_M, KC_N, LTS(KC_E), LTN(KC_I), KC_O,    KC_QUOT,
-      KC_LSFT, KC_Z, KC_X,      KC_C,      KC_D, KC_V, DF(_GAMING), KC_ESC, MO(_CONFIG), KC_ENT, KC_K, KC_H, KC_COMM,   KC_DOT,    KC_SLSH, KC_RSFT,
-         _______, LM(_NUM, MOD_LALT), ALT_T(KC_ESC), SFT_T(KC_ENT), TD(TD_MOVE), TD(TD_MOVE), SFT_T(KC_SPC), ALT_T(KC_TAB), LM(_NUM, MOD_LALT), _______
+    [_COLEMAK] = LAYOUT_kyria_custom_wrapper(
+      KC_ESC,  ____________COLEMAK_DHM_L1___________, ____________COLEMAK_DHM_R1___________, KC_DEL,
+      KC_TAB,  ________COLEMAK_Dhm_HMOD_LEFT________, ________COLEMAK_Dhm_HMOD_RIGHT_______, KC_BSPC,
+      KC_LSFT, ____________COLEMAK_DHM_L3___________, ____________COLEMAK_DHM_R3___________, KC_RSFT,
+                              _____________DEFAULT_THUMBS_CLUSTER____________
     ),
 
 /*
- * Base Layer: Gaming
- *
- * ,-------------------------------------------.
- * |   ESC  |   1  |   2  |   3  |   4  |   5  |
- * |--------+------+------+------+------+------|
- * |   TAB  |   T  |   Q  |   W  |  E   |   R  |
- * |--------+------+------+------+------+------+-------------.
- * |        |   G  |   A  |   S  |   D  |   F  | base |      |
- * `---------------+-------------+------+------+------+------|
- *                        |      | CTRL |  ALT | SPACE| ENTR |
- *                        |      |      |      |      |      |
- *                        `----------------------------------'
+ * Base Layer: Gaming [ {/!\} in progress {/!\} ]
+ * ,--------. ,----------------------------------.    ,----------------------------------. ,--------.
+ * |  ESC   | |   5  |   1  |   2  |   3  |   4  |    |      |      |      |      |      | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |  TAB   | |   T  |   Q  |   W  |   E  |   R  |    |      |      |      |      |      | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |        | |   R  |   T  |   Q  |   W  |   E  |    |      |      |      |      |      | |        |
+ * `--------' `----------------------------------'    `----------------------------------' `--------'
+ *                                 ,-------------.    ,-------------.
+ *                                 | BASE |      |    |      | BASE |
+ *            ,--------------------+------+------|    |------+------+--------------------.
+ *            |      |      |  ALT | SPACE| ENTR |    |      |      |      |      |      |
+ *            |      |      |      |[CTRL]|      |    |      |      |      |      |      |
+ *            `----------------------------------'    `----------------------------------'
  */
-    [_GAMING] = LAYOUT(
-      KC_ESC , KC_5, KC_1, KC_2, KC_3, KC_4,                                           _______, _______, _______, _______, _______, _______,
-      KC_TAB , KC_T, KC_Q, KC_W, KC_E, KC_R,                                          _______, _______, _______, _______, _______, _______,
-      _______, KC_G, KC_A, KC_S, KC_D, KC_D, DF(_COLEMAK), _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                           _______, _______, KC_LALT, KC_SPC , _______, _______, _______, _______, _______, _______
+    [_GAMING] = LAYOUT_kyria_custom_wrapper(
+      KC_ESC ,         KC_5, KC_1, KC_2, KC_3, KC_4,  ________________BLANK________________, _______,
+      KC_TAB ,         KC_T, KC_Q, KC_W, KC_E, KC_R,  ________________BLANK________________, _______,
+      _______,         KC_G, KC_A, KC_S, KC_D, KC_D,  ________________BLANK________________, _______,
+                              DF(_COLEMAK), _______,  _______, DF(_COLEMAK),
+_______, _______, _______, KC_LALT, CTL_T(KC_SPACE),  ________________BLANK________________
     ),
 
 /*
  * Lower Layer: Symbols
  *
- * ,-------------------------------------------.                              ,-------------------------------------------.
- * |        |  !   |  @   |  {   |  }   |  |   |                              |      |  _   |  ?   |      |      |  | \   |
- * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        |  #   |  $   |  (   |  )   |  `   |                              |   +  |  -   |  /   |  *   |  %   |  ' "   |
- * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |  %   |  ^   |  [   |  ]   |  ~   |      |      |  |      |      |   &  |  =   |  ,   |  .   |  / ? | - _    |
- * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      |      |  :   |  =   |  |  =   |  ;   |      |      |      |
- *                        |      |      |      | SHIFT|      |  |      | SHIFT|      |      |      |
- *                        `----------------------------------'  `----------------------------------'
+ * ,--------. ,----------------------------------.    ,----------------------------------. ,--------.
+ * |        | |   !  |   @  |   {  |   }  |   |  |    |      |   \  |   ;  |      |      | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |    "   | |   #  |   $  |   (  |   )  |   `  |    |   +  |   -  |   :  |   *  |   ?  | |    '   |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |        | |   %  |   ^  |   [  |   ]  |   ~  |    |   &  |   =  |   _  |   _  |   /  | |        |
+ * `--------' `----------------------------------'    `----------------------------------' `--------'
  */
-    [_SYMB] = LAYOUT(
-      _______, KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE,                                     _______, S(KC_MINS), S(KC_SLASH), _______, _______, KC_BSLS,
-      _______, KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV,                                      KC_PLUS, KC_MINS, KC_SLSH, KC_ASTR, KC_PERC, KC_QUOT,
-      _______, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD, _______, _______, _______, _______, KC_AMPR, KC_EQL,  KC_COMM, KC_DOT,  KC_SLSH, KC_MINS,
-                        _______, _______, _______, TD(TD_SCOL), KC_EQL,  KC_EQL,  SFT_T(KC_SCLN), _______, _______, _______
+    [_SYMB] = LAYOUT_kyria_custom_wrapper(
+      _______, ________________SYMB_L1______________,  ________________SYMB_R1______________, _______,
+      KC_DQUO, ________________SYMB_L2______________,  ________________SYMB_R2______________, KC_QUOT,
+      _______, ________________SYMB_L3______________,  ________________SYMB_R3______________, _______,
+                            ______________BLANK_THUMBS_CLUSTER_____________
     ),
 /*
  * Raise Layer: Number keys, media, navigation
  *
- * ,-------------------------------------------.                              ,-------------------------------------------.
- * |        |   1  |  2   |  3   |  4   |  5   |                              |  6   |  7   |  8   |  9   |  0   |        |
- * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        |      | Prev | Play | Next | VolUp|                              | Left | Down | Up   | Right|      |        |
- * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |      |      |      | Mute | VolDn|      |      |  |      |      | MLeft| Mdown| MUp  |MRight|      |        |
- * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      |      |      |      |  |      |      |      |      |      |
- *                        |      |      |      |      |      |  |      |      |      |      |      |
- *                        `----------------------------------'  `----------------------------------'
+ * ,--------. ,----------------------------------.    ,----------------------------------. ,--------.
+ * |        | |   1  |   2  |   3  |   4  |   5  |    |   6  |   7  |   8  |   9  |   0  | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |        | |      |   玲 |     |   怜 |     |    |      |   ←  |   ↓  |   ↑  |   →  | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |        | |      |      |      |     |     |    |      |   ← |   ↓ |   ↑ |   → | |        |
+ * `--------' `----------------------------------'    `----------------------------------' `--------'
  */
-    [_NUM] = LAYOUT(
-      _______, KC_1,    KC_2,    KC_3,    KC_4,    KC_5,                                        KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    _______,
-      _______, _______, KC_MPRV, KC_MPLY, KC_MNXT, KC_VOLU,                                     _______, KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______,
-      _______, _______, _______, _______, KC_MUTE, KC_VOLD, _______, _______, _______, _______, _______, KC_MS_L, KC_MS_D, KC_MS_U, KC_MS_R, _______,
-                                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+    [_NUM] = LAYOUT_kyria_custom_wrapper(
+      _______, _______________NUM_LEFT______________,  _______________NUM_RIGHT_____________, _______,
+      _______, _______________MUSIC_1_______________,  _______________ARROWS________________, _______,
+      _______, _______________MUSIC_2_______________,  ________________MOUSE________________, _______,
+                            /*______________BLANK_THUMBS_CLUSTER_____________*/
+                                    _______, _______,   _______, _______, \
+        _______, _______, _______, _______, MO(_NUM),   MO(_NUM), _______, _______, _______, _______
     ),
 /*
  * Adjust Layer: Function keys, RGB
  *
- * ,-------------------------------------------.                              ,-------------------------------------------.
- * |        | F1   |  F2  | F3   | F4   | F5   |                              | F6   | F7   |  F8  | F9   | F10  |        |
- * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
- * |        | TOG  | SAI  | HUI  | VAI  | MOD  |                              |      |      |      | F11  | F12  |        |
- * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
- * |        |      | SAD  | HUD  | VAD  | RMOD |      |      |  |      |      |      |      |      |      |      |        |
- * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |      |      |      |      |      |  |      |      |      |      |      |
- *                        |      |      |      |      |      |  |      |      |      |      |      |
- *                        `----------------------------------'  `----------------------------------'
+ * ,--------. ,----------------------------------.    ,----------------------------------. ,--------.
+ * |        | |  F1  |  F2  |  F3  |  F4  |  F5  |    |  F6  |  F7  |  F8  |  F9  | F10  | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |        | |  TOG |  SA↑ |  HU↑ |  VA↑ |  MOD |    |      |      |      |      |      | |        |
+ * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
+ * |        | |      |  SA↓ |  HU↓ |  VA↓ | RMOD |    |      |      |      |      |      | |        |
+ * `--------' `----------------------------------'    `----------------------------------' `--------'
  */
-    [_CONFIG] = LAYOUT(
-      _______, KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                                       KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  _______,
-      _______, RGB_TOG, RGB_SAI, RGB_HUI, RGB_VAI, RGB_MOD,                                     _______, _______, _______, KC_F11,  KC_F12,  _______,
-      _______, _______, RGB_SAD, RGB_HUD, RGB_VAD, RGB_RMOD, TG(_CONFIG), _______, _______, _______, _______, _______, _______, _______, _______, _______,
-                                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
+    [_CONFIG] = LAYOUT_kyria_custom_wrapper(
+      _______, ______________FUNC_LEFT______________,  ______________FUNC_RIGHT_____________, _______,
+      _______, ________________RGB_1________________,  ________________BLANK________________, _______,
+      _______, ________________RGB_2________________,  ________________BLANK________________, _______,
+                            ______________BLANK_THUMBS_CLUSTER_____________
     ),
-// /*
-//  * Layer template
-//  *
-//  * ,-------------------------------------------.                              ,-------------------------------------------.
-//  * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
-//  * |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
-//  * |        |      |      |      |      |      |                              |      |      |      |      |      |        |
-//  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
-//  * |        |      |      |      |      |      |      |      |  |      |      |      |      |      |      |      |        |
-//  * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//  *                        |      |      |      |      |      |  |      |      |      |      |      |
-//  *                        |      |      |      |      |      |  |      |      |      |      |      |
-//  *                        `----------------------------------'  `----------------------------------'
-//  */
-//     [_LAYERINDEX] = LAYOUT(
-//       _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
-//       _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
-//       _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-//                                  _______, _______, _______, _______, _______, _______, _______, _______, _______, _______
-//     ),
 };
 
-void keyboard_post_init_user(void) {
-#ifdef RGBLIGHT_ENABLE
-    keyboard_post_init_rgb();
-#endif // RGBLIGHT_ENABLE
-}
-
-uint32_t layer_state_set_user(uint32_t state) {
-#ifdef RGBLIGHT_ENABLE
-    layer_state_set_rgb(state);
-#endif // RGBLIGHT_ENABLE
-    return state;
-}
-
-uint32_t default_layer_state_set_user(uint32_t default_state) {
-#if defined(RGBLIGHT_ENABLE) && ! defined(RGBLIGHT_LAYERS)
-    default_layer_state_set_rgb(default_state);
-#endif // RGBLIGHT_ENABLE && ! RGBLIGHT_LAYERS
-    return default_state;
-}
-
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        default:
-            return true;
-    }
-}
-
-void matrix_scan_user(void) {
+/* ────────────────────── RGB color layers definition ─────────────────────── */
 #ifdef RGBLIGHT_LAYERS
-    led_update_user(host_keyboard_led_state());
-#endif // RGBLIGHT_LAYERS
-}
-
-/* ─────────────────────────────── RGB lights ─────────────────────────────── */
-
-#ifdef RGBLIGHT_LAYERS
-const rgblight_segment_t PROGMEM rgb_gaming_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_RED} );
-const rgblight_segment_t PROGMEM rgb_config_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_PURPLE} );
-const rgblight_segment_t PROGMEM rgb_colemak_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_WHITE} );
-const rgblight_segment_t PROGMEM rgb_symbols_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_BLUE} );
-const rgblight_segment_t PROGMEM rgb_numbers_layer[] = RGBLIGHT_LAYER_SEGMENTS( {0, 20, HS_GREEN} );
-
+const rgblight_segment_t PROGMEM rgb_colemak_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 20, HS_WHITE}
+);
+const rgblight_segment_t PROGMEM rgb_gaming_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 20, HS_RED}
+);
+const rgblight_segment_t PROGMEM rgb_symbols_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 20, HS_BLUE}
+);
+const rgblight_segment_t PROGMEM rgb_numbers_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 20, HS_GREEN}
+);
+const rgblight_segment_t PROGMEM rgb_config_layer[] = RGBLIGHT_LAYER_SEGMENTS(
+    {0, 20, HS_PURPLE}
+);
 const rgblight_segment_t PROGMEM rgb_alt_layer[] = RGBLIGHT_LAYER_SEGMENTS(
     {5, 2, HS_GOLD},
     {15, 2, HS_GOLD}
 );
-
 const rgblight_segment_t PROGMEM rgb_ctrl_layer[] = RGBLIGHT_LAYER_SEGMENTS(
     {2, 2, HS_GOLD},
     {12, 2, HS_GOLD}
@@ -249,8 +256,7 @@ const rgblight_segment_t PROGMEM rgb_shift_layer[] = RGBLIGHT_LAYER_SEGMENTS(
     {10, 2, HS_GOLD}
 );
 
-
-const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
+const rgblight_segment_t* const PROGMEM rgb_layers[] = RGBLIGHT_LAYERS_LIST(
     rgb_colemak_layer,
     rgb_gaming_layer,
     rgb_symbols_layer,
@@ -260,170 +266,22 @@ const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
     rgb_ctrl_layer,
     rgb_shift_layer
 );
+#endif // RGBLIGHT_LAYERS
 
-bool led_update_user(led_t led_state) {
-    rgblight_set_layer_state(5, get_mods() & MOD_MASK_ALT);
-    rgblight_set_layer_state(6, get_mods() & MOD_MASK_CTRL);
-    rgblight_set_layer_state(7, get_mods() & MOD_MASK_SHIFT);
+void keyboard_post_init_keymap(void) {
+#ifdef RGBLIGHT_LAYERS
+    rgblight_layers = rgb_layers;
+    debug_enable=true;
+#endif // RGBLIGHT_LAYERS
+}
+
+bool led_update_keymap(led_t led_state) {
+#ifdef RGBLIGHT_LAYERS
+    rgblight_set_layer_state(__LAST, get_mods() & MOD_MASK_ALT);
+    rgblight_set_layer_state(__LAST + 1, get_mods() & MOD_MASK_CTRL);
+    rgblight_set_layer_state(__LAST + 2, get_mods() & MOD_MASK_SHIFT);
+#endif // RGBLIGHT_LAYERS
     return true;
 }
-#endif
 
-#ifdef RGBLIGHT_ENABLE
-void keyboard_post_init_rgb(void) {
-    rgblight_enable_noeeprom();
-    rgblight_sethsv(rgblight_get_hue(), rgblight_get_sat(), 80);
-#    ifdef RGBLIGHT_LAYERS
-    rgblight_layers = my_rgb_layers;
-#    else
-    default_layer_rgb(default_layer_state);
-#    endif // RGBLIGHT_LAYERS
-}
-
-void layer_state_set_rgb(uint32_t state) {
-#    ifdef RGBLIGHT_LAYERS
-    // State for normal layers
-    for (int i = _SYMB; i < __LAST; i++) {
-        rgblight_set_layer_state(i, layer_state_cmp(state, i));
-    }
-    /*send_layer_via_hid(state);*/
-#    else
-    uint8_t val = rgblight_get_val();
-    switch (biton32(state)) {
-        case _SYMB:
-            rgblight_sethsv_noeeprom(HS_BLUE, val); break;
-        case _NUM:
-            rgblight_sethsv_noeeprom(HS_GREEN, val); break;
-        case _CONFIG:
-            rgblight_sethsv_noeeprom(HS_PURPLE, val); break;
-        default:
-            default_layer_rgb(default_layer_state); break;
-    }
-#    endif // RGBLIGHT_LAYERS
-}
-
-void default_layer_state_set_rgb(uint32_t default_state) {
-#    ifdef RGBLIGHT_LAYERS
-    // Default layers
-    rgblight_set_layer_state(_COLEMAK, default_state & (1UL << _COLEMAK));
-    rgblight_set_layer_state(_GAMING, default_state & (1UL << _GAMING));
-#    else
-    default_layer_rgb(default_state);
-#    endif // ! RGBLIGHT_LAYERS
-}
-
-#    ifndef RGBLIGHT_LAYERS
-void default_layer_rgb(uint32_t default_state) {
-    uint8_t val = rgblight_get_val();
-    switch (biton32(default_state)) {
-        case _COLEMAK:
-            rgblight_sethsv_noeeprom(HS_WHITE, val); break;
-        case _GAMING:
-            rgblight_sethsv_noeeprom(HS_RED, val); break;
-        default:
-            rgblight_sethsv_noeeprom(HS_WHITE, val); break;
-    }
-}
-#    endif // ! RGBLIGHT_LAYERS
-#endif // RGBLIGHT_ENABLE
-
-
-/* ─────────────────────────────── Tap Dance ──────────────────────────────── */
-// Determine the current tap dance state
-uint8_t cur_dance(qk_tap_dance_state_t *state) {
-    if (state->count == 1) {
-        if (!state->pressed) {
-            return SINGLE_TAP;
-        } else {
-            return SINGLE_HOLD;
-        }
-    } else if (state->count == 2) {
-        return DOUBLE_TAP;
-    }
-    else return 8;
-}
-
-static tap mv_state = {
-    .is_press_action = true,
-    .state = 0
-};
-static tap sft_state = {
-    .is_press_action = true,
-    .state = 0
-};
-
-// Functions that control what our tap dance key does
-void mv_finished(qk_tap_dance_state_t *state, void *user_data) {
-    mv_state.state = cur_dance(state);
-    switch (mv_state.state) {
-        case SINGLE_HOLD:  // Hold → CTRL
-            register_code(KC_LCTL);
-            break;
-        case SINGLE_TAP:  // 1 Tap → OSM(ALT) + OSL(_NUM)
-            set_oneshot_layer(_NUM, ONESHOT_START);
-            clear_oneshot_layer_state(ONESHOT_PRESSED);
-            set_oneshot_mods(MOD_LALT);
-            break;
-        case DOUBLE_TAP:  // 2 Tap → CTRL_A + OSL(_NUM)
-            SEND_STRING(SS_DOWN(X_LCTRL) SS_TAP(X_A) SS_UP(X_LCTRL));
-            set_oneshot_layer(_NUM, ONESHOT_START);
-            clear_oneshot_layer_state(ONESHOT_PRESSED);
-            break;
-    }
-}
-
-void mv_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // If the key was held down and now is released then switch off the mod
-    switch (mv_state.state) {
-        case SINGLE_TAP: break;
-        case SINGLE_HOLD: unregister_code(KC_LCTRL); break;
-        case DOUBLE_TAP: break;
-    }
-    mv_state.state = 0;
-}
-
-// Functions that control what our tap dance key does
-void sft_finished(qk_tap_dance_state_t *state, void *user_data) {
-    sft_state.state = cur_dance(state);
-    switch (sft_state.state) {
-        case SINGLE_HOLD: register_code(KC_LSFT); break;
-        case SINGLE_TAP: register_code16(KC_COLN); break;
-    }
-}
-
-void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
-    // If the key was held down and now is released then switch off the mod
-    switch (sft_state.state) {
-        case SINGLE_HOLD: unregister_code(KC_LSFT); break;
-        case SINGLE_TAP: unregister_code16(KC_COLN); break;
-    }
-    sft_state.state = 0;
-}
-
-// Associate our tap dance key with its functionality
-qk_tap_dance_action_t tap_dance_actions[] = {
-    [TD_MOVE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mv_finished, mv_reset),
-    [TD_SCOL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset),
-
-};
-
-bool process_record_keymap(uint16_t keycode, keyrecord_t *record) {
-
-    switch (keycode) {
-        case KC_NO:
-            /* Always cancel one-shot layer when another key gets pressed */
-            if (record->event.pressed && is_oneshot_layer_active())
-                clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
-            return true;
-        case RESET:
-            /* Don't allow reset from oneshot layer state */
-            if (record->event.pressed && is_oneshot_layer_active()){
-                clear_oneshot_layer_state(ONESHOT_OTHER_KEY_PRESSED);
-                return false;
-            }
-            return true;
-        default:
-            return true;
-    }
-    return true;
-}
+// vim: textwidth=101

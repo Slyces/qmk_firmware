@@ -323,9 +323,9 @@ void rgblight_mode_eeprom_helper(uint8_t mode, bool write_to_eeprom) {
     RGBLIGHT_SPLIT_SET_CHANGE_MODE;
     if (write_to_eeprom) {
         eeconfig_update_rgblight(rgblight_config.raw);
-        dprintf("rgblight mode [EEPROM]: %u\n", rgblight_config.mode);
+        /*dprintf("rgblight mode [EEPROM]: %u\n", rgblight_config.mode);*/
     } else {
-        dprintf("rgblight mode [NOEEPROM]: %u\n", rgblight_config.mode);
+        /*dprintf("rgblight mode [NOEEPROM]: %u\n", rgblight_config.mode);*/
     }
     if (is_static_effect(rgblight_config.mode)) {
         rgblight_timer_disable();
@@ -906,7 +906,7 @@ void rgblight_timer_disable(void) {
     if (fled_mode != FLED_RGB) {
         rgblight_status.timer_enabled = false;
         RGBLIGHT_SPLIT_SET_CHANGE_TIMER_ENABLE;
-        dprintf("rgblight timer disable.\n");
+        /*dprintf("rgblight timer disable.\n");*/
     }
 }
 void rgblight_timer_toggle(void) {
