@@ -16,13 +16,16 @@
 #include "combos.h"
 
 /* ─────────────────────────── combos definition ──────────────────────────── */
-const uint16_t PROGMEM ei_combo[] = {
-    KC_A,
-    KC_B,
-    COMBO_END
-};
+const uint16_t PROGMEM ei_combo[] = {KC_E, KC_I, COMBO_END};
+/*const uint16_t PROGMEM rs_combo[] = {KC_R, KC_S, COMBO_END};*/
+/*const uint16_t PROGMEM ne_combo[] = {KC_N, KC_E, COMBO_END};*/
+/*const uint16_t PROGMEM st_combo[] = {KC_S, KC_T, COMBO_END};*/
 
 /* ────────────────────────────── combos list ─────────────────────────────── */
 combo_t key_combos[COMBO_COUNT] = {
   [EI_ESC] = COMBO(ei_combo, KC_ESC),
+  /*[RS_ESC] = COMBO(rs_combo, KC_ESC),*/
+  /*[NE_OSL] = COMBO(ne_combo, OSL(MOD_LSFT)),*/
+  /*[ST_OSL] = COMBO(st_combo, OSL(MOD_LSFT)),*/
 };
+

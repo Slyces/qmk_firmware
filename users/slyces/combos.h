@@ -18,5 +18,8 @@
 
 /* ───────────────────── enumeration of combos keycodes ───────────────────── */
 enum combos {
-  EI_ESC
+    EI_ESC,
+    //RS_ESC,
+    //NE_OSL,
+    //ST_OSL,
 };
