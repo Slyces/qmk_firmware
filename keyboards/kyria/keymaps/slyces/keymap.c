@@ -90,7 +90,7 @@
 /* Re-pass though to allow templates to be used */
 #define LAYOUT_kyria_custom_wrapper(...)       LAYOUT_kyria_custom(__VA_ARGS__)
 
-/* ───────────────────────────────────── Tap dance Shprtcuts ───────────────────────────────────── */
+/* ───────────────────────────────────── Tap dance Shortcuts ───────────────────────────────────── */
 #ifdef TAP_DANCE_ENABLE
     #define TD_M TD(TD_MOVE)
 #else
@@ -121,6 +121,10 @@
                              DF(_GAMING), MO(_CONFIG), MO(_CONFIG), DF(_GAMING), \
  _______, _______, ALT_T(KC_ESC), CTL_T(KC_ENT), TD_M, TD_M, CTL_T(KC_SPC), ALT_T(KC_TAB), _______, _______
 
+
+/* ───────────────────────────────────────── shortcuts ────────────────────────────────────────── */
+#define OS_SFT OSM(MOD_LSFT)
+
 /* ─────────────────────────────────────────── layers ──────────────────────────────────────────── */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /*
@@ -131,7 +135,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
  * |  TAB   | |   A  |   R  |   S  |   T  |   G  |    |   M  |   N  |   E  |   I  |   O  | | BACKSP |
  * |--------| |------+------+------+------+------|    |------+------+------+------+------| |--------|
- * | LSHIFT | |   Z  |   X  |   C  |   D  |   V  |    |   K  |   H  |  , < |  . > |  / ? | | RSHIFT |
+ * |OS_SHIFT| |   Z  |   X  |   C  |   D  |   V  |    |   K  |   H  |  , < |  . > |  / ? | |OS_SHIFT|
  * `--------' `----------------------------------'    `----------------------------------' `--------'
  *                                 ,-------------.    ,-------------.
  *                                 |GAMING|CONFIG|    |CONFIG|GAMING|
@@ -141,9 +145,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  *            `----------------------------------'    `----------------------------------'
  */
     [_COLEMAK] = LAYOUT_kyria_custom_wrapper(
-      KC_ESC,  ____________COLEMAK_DHM_L1___________, ____________COLEMAK_DHM_R1___________, KC_DEL,
-      KC_TAB,  ________COLEMAK_Dhm_HMOD_LEFT________, ________COLEMAK_Dhm_HMOD_RIGHT_______, KC_BSPC,
-      KC_LSFT, ____________COLEMAK_DHM_L3___________, ____________COLEMAK_DHM_R3___________, KC_RSFT,
+      KC_ESC, ____________COLEMAK_DHM_L1___________, ____________COLEMAK_DHM_R1___________, KC_DEL,
+      KC_TAB, ________COLEMAK_Dhm_HMOD_LEFT________, ________COLEMAK_Dhm_HMOD_RIGHT_______, KC_BSPC,
+      OS_SFT, ____________COLEMAK_DHM_L3___________, ____________COLEMAK_DHM_R3___________, OS_SFT,
                               _____________DEFAULT_THUMBS_CLUSTER____________
     ),
 
