@@ -55,13 +55,12 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 void mv_finished(qk_tap_dance_state_t *state, void *user_data) {
     mv_state.state = cur_dance(state);
     switch (mv_state.state) {
-        case SINGLE_HOLD:  // Hold → CTRL
-            layer_on(_NUM);
+        case SINGLE_TAP:  // 1 Tap → OSL(shift)
+            set_oneshot_mods(MOD_LSFT);
             break;
-        case SINGLE_TAP:  // 1 Tap → OSM(ALT) + OSL(_NUM)
-            set_oneshot_layer(_NUM, ONESHOT_START);
-            clear_oneshot_layer_state(ONESHOT_PRESSED);
-            set_oneshot_mods(MOD_LALT);
+        case SINGLE_HOLD:  // Hold → NUM + ALT
+            layer_on(_NUM);
+            register_mods(MOD_BIT(KC_LALT));
             break;
         case DOUBLE_TAP:  // 2 Tap → CTRL_A + OSL(_NUM)
             SEND_STRING(SS_DOWN(X_LCTRL) SS_TAP(X_A) SS_UP(X_LCTRL));
@@ -75,7 +74,10 @@ void mv_reset(qk_tap_dance_state_t *state, void *user_data) {
     // If the key was held down and now is released then switch off the mod
     switch (mv_state.state) {
         case SINGLE_TAP: break;
-        case SINGLE_HOLD: layer_off(_NUM); break;
+        case SINGLE_HOLD:
+            layer_off(_NUM);
+            unregister_mods(MOD_BIT(KC_LALT));
+            break;
         case DOUBLE_TAP: break;
     }
     mv_state.state = 0;
