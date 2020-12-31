@@ -32,7 +32,8 @@ typedef struct {
 /* -------------------------------- keycodes -------------------------------- */
 enum td_keycodes {
     TD_MOVE,
-    TD_SCOL
+    TD_SCOL,
+    TD_ALT,
 };
 
 
@@ -44,6 +45,10 @@ void mv_reset(qk_tap_dance_state_t *state, void *user_data);
 // Shift
 void sft_finished(qk_tap_dance_state_t *state, void *user_data);
 void sft_reset(qk_tap_dance_state_t *state, void *user_data);
+
+// alt + OSL(sft)
+void os_alt_finished(qk_tap_dance_state_t *state, void *user_data);
+void os_alt_reset(qk_tap_dance_state_t *state, void *user_data);
 
 /* --------------------------------- utils ---------------------------------- */
 uint8_t cur_dance(qk_tap_dance_state_t *state);

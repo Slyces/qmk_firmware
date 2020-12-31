@@ -51,7 +51,6 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 }
 
 /* ────────────────────────── tap dance functions ─────────────────────────── */
-// Functions that control what our tap dance key does
 void mv_finished(qk_tap_dance_state_t *state, void *user_data) {
     mv_state.state = cur_dance(state);
     switch (mv_state.state) {
@@ -83,7 +82,8 @@ void mv_reset(qk_tap_dance_state_t *state, void *user_data) {
     mv_state.state = 0;
 }
 
-// Functions that control what our tap dance key does
+// --------------------------------
+
 void sft_finished(qk_tap_dance_state_t *state, void *user_data) {
     sft_state.state = cur_dance(state);
     switch (sft_state.state) {
@@ -101,8 +101,36 @@ void sft_reset(qk_tap_dance_state_t *state, void *user_data) {
     sft_state.state = 0;
 }
 
+// --------------------------------
+
+void os_alt_finished(qk_tap_dance_state_t *state, void *user_data) {
+    mv_state.state = cur_dance(state);
+    switch (mv_state.state) {
+        case SINGLE_TAP:  // 1 Tap → OSL(shift)
+            set_oneshot_mods(MOD_LSFT);
+            break;
+        case SINGLE_HOLD:  // Hold → NUM + ALT
+            register_mods(MOD_BIT(KC_LALT));
+            break;
+    }
+}
+
+void os_alt_reset(qk_tap_dance_state_t *state, void *user_data) {
+    // If the key was held down and now is released then switch off the mod
+    switch (mv_state.state) {
+        case SINGLE_TAP: break;
+        case SINGLE_HOLD:
+            layer_off(_NUM);
+            unregister_mods(MOD_BIT(KC_LALT));
+            break;
+    }
+    mv_state.state = 0;
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
 // Associate our tap dance key with its functionality
 qk_tap_dance_action_t tap_dance_actions[] = {
     [TD_MOVE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, mv_finished, mv_reset),
     [TD_SCOL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, sft_finished, sft_reset),
+    [TD_ALT] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, os_alt_finished, os_alt_reset),
 };

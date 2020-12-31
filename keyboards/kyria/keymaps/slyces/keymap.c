@@ -90,11 +90,16 @@
 /* Re-pass though to allow templates to be used */
 #define LAYOUT_kyria_custom_wrapper(...)       LAYOUT_kyria_custom(__VA_ARGS__)
 
+/* ───────────────────────────────────────── shortcuts ────────────────────────────────────────── */
+#define OS_SFT OSM(MOD_LSFT)
+
 /* ───────────────────────────────────── Tap dance Shortcuts ───────────────────────────────────── */
 #ifdef TAP_DANCE_ENABLE
     #define TD_M TD(TD_MOVE)
+    #define TD_A TD(TD_ALT)
 #else
     #define TD_M _______
+    #define TD_A _______
 #endif
 
 /* ─────────────────────────────────────── Thumb Clusters ──────────────────────────────────────── */
@@ -113,17 +118,13 @@
 /*                                 ,-------------.    ,-------------.
  *                                 |GAMING|CONFIG|    |CONFIG|GAMING|
  *            ,--------------------+------+------|    |------+------+--------------------.
- *            |      |      | ESC  | ENTR |  i3  |    |  i3  | SPC  |  TAB |      |      |
+ *            |      |      |OS_SFT| ENTR |  i3  |    |  i3  | SPC  |OS_SFT|      |      |
  *            |      |      |[ALT] |[CTRL]| tmux |    | tmux |[CTRL]| [ALT]|      |      |
  *            `----------------------------------'    `----------------------------------'
  */
 #define _____________DEFAULT_THUMBS_CLUSTER____________ \
-                             DF(_GAMING), MO(_CONFIG), MO(_CONFIG), DF(_GAMING), \
- _______, _______, ALT_T(KC_ESC), CTL_T(KC_ENT), TD_M, TD_M, CTL_T(KC_SPC), ALT_T(KC_TAB), _______, _______
-
-
-/* ───────────────────────────────────────── shortcuts ────────────────────────────────────────── */
-#define OS_SFT OSM(MOD_LSFT)
+                    DF(_GAMING), MO(_CONFIG), MO(_CONFIG), DF(_GAMING), \
+ _______, _______, TD_A, CTL_T(KC_ENT), TD_M, TD_M, CTL_T(KC_SPC), TD_A, _______, _______
 
 /* ─────────────────────────────────────────── layers ──────────────────────────────────────────── */
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
