@@ -20,9 +20,8 @@
 
 /* ───────────────────────────── combos options ───────────────────────────── */
 #ifdef COMBO_ENABLE
-    //#define COMBO_COUNT 4
-    #define COMBO_COUNT 1
-    #define COMBO_TERM 500
+    #define COMBO_COUNT 4
+    #define COMBO_TERM 30
 #endif
 
 /* ──────────────────────────── mod tap options ───────────────────────────── */

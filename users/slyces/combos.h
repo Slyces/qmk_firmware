@@ -18,8 +18,8 @@
 
 /* ───────────────────── enumeration of combos keycodes ───────────────────── */
 enum combos {
-    EI_ESC,
-    //RS_ESC,
-    //NE_OSL,
-    //ST_OSL,
+    HOME_RIGHT_ESC,
+    HOME_LEFT_ESC,
+    HOME_RIGHT_SFT,
+    HOME_LEFT_SFT,
 };
