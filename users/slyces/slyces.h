@@ -34,14 +34,7 @@
 
 /* ─────────────────── define UK variants of symbol keys ──────────────────── */
 #ifdef UK_LAYOUT
-// US @ = Shift(2) -- UK @ = Shift(')
-#    undef   KC_AT
-#    define  KC_AT LSFT(KC_QUOTE)
-// US " = Shift(') -- UK " = Shift(2)
-#    undef   KC_DOUBLE_QUOTE
-#    define  KC_DOUBLE_QUOTE LSFT(KC_2)
-#    undef   KC_DQUO
-#    define  KC_DQUO KC_DOUBLE_QUOTE
+#    include "keymap_uk.h"
 #endif
 
 

@@ -1,4 +1,4 @@
-/* Copyright 2020 Thomas Baart <thomas@splitkb.com>
+/* Copyright 2020 Simon Lassourreuille <slyces.coding@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,11 +89,11 @@
  *    L3  |   %  |   ^  |   [  |   ]  |   ~  |    |   &  |   =  |   _  |   _  |   /  |  R3
  *        `----------------------------------'    `----------------------------------'
  */
-#define ________________SYMB_L1______________     KC_EXLM, KC_AT,   KC_LCBR, KC_RCBR, KC_PIPE
-#define ________________SYMB_L2______________     KC_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV
-#define ________________SYMB_L3______________     KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TILD
+#define ________________SYMB_L1______________     KC_EXLM, UK_AT,   KC_LCBR, KC_RCBR, UK_PIPE
+#define ________________SYMB_L2______________     UK_HASH, KC_DLR,  KC_LPRN, KC_RPRN, KC_GRV
+#define ________________SYMB_L3______________     KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, UK_TILD
 
-#define ________________SYMB_R1______________     _______, KC_BSLS, KC_SCLN, _______, _______
+#define ________________SYMB_R1______________     _______, UK_BSLS, KC_SCLN, _______, _______
 #define ________________SYMB_R2______________     KC_PLUS, KC_MINS, KC_COLN, KC_ASTR, KC_QUES
 #define ________________SYMB_R3______________     KC_AMPR, KC_EQL,  KC_UNDS, KC_UNDS, KC_SLSH
 
@@ -132,6 +132,7 @@
 
 #define ________________RGB_1________________   RGB_TOG, RGB_SAI, RGB_HUI, RGB_VAI, RGB_MOD
 #define ________________RGB_2________________   _______, RGB_SAD, RGB_HUD, RGB_VAD, RGB_RMOD
+
 // Drashna's config layer
 //#define ______________CONFIG_L1______________   RGB_MOD, RGB_HUI, RGB_SAI, RGB_VAI, RGB_TOG
 //#define ______________CONFIG_L2______________   MU_TOG , CK_TOGG, AU_ON,   AU_OFF,  CG_NORM
